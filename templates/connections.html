@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Connections</title>
+    <link rel="stylesheet" href="/static/css/connections.css">
+</head>
+<body>
+    <h1>Active Connections</h1>
+    <table id="table">
+        <tr>
+            <th>User</th>
+            <th>IP</th>
+            <th>Channel</th>
+            <th>SID</th>
+            <th>Close Connection</th>
+        </tr>
+    </table>
+</body>
+<script>
+    let table = document.getElementById("table");
+    const clearTR = () => {
+        while (table.firstChild) {
+            table.removeChild(table.firstChild);
+        }
+        let tr = document.createElement("tr");
+        tr.innerHTML = "<tr><th>User</th><th>IP</th><th>Channel</th><th>SID</th><th>Close Connection</th></tr>";
+        table.append(tr);
+    }
+    setInterval(() => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/activeConnections", true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                let resp = JSON.parse(xhr.responseText);
+                clearTR();
+                if (resp == undefined) { return; }
+                for (key in resp) {
+                    let username = resp[key]["username"];
+                    let channel = resp[key]["channel"];
+                    let ip = resp[key]["ip"];
+                    let sid = resp[key]["session"];
+                    let tr = document.createElement("tr");
+                    tr.innerHTML = `<td>${username}</td><td>${ip}</td><td>${channel}</td><td>${sid}</td><td><a href="/api/closeConnection/${sid}">Close</a></td>`;
+                    table.append(tr);
+                }
+            }
+        }
+        xhr.send();
+    }, 2000);
+</script>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users</title>
+    <link rel="stylesheet" href="/static/css/users.css">
+</head>
+<body>
+    <h1>Users</h1>
+    <table id="table">
+        <tr>
+            <th>Username</th>
+            <th>IP</th>
+            <th>Reset Reset Password</th>
+            <th>Delete Account</th>
+        </tr>
+    </table>
+    <div id="resetPassword" class="resetPassword">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button id="resetPasswordButton" onclick="doResetPassword()">Reset Password</button>
+    </div>
+    <div class="createAccount" id="createAccount">
+        <input type="text" id="username2" placeholder="Username">
+        <input type="password" id="password2" placeholder="Password">
+        <button id="createAccountButton" onclick="doCreateAccount()">Create Account</button>
+    </div>
+    <button id="createAccountAsk" onclick="createAccount()"">Create Account</button>
+</body>
+<script>
+    let table = document.getElementById("table");
+    const clearTR = () => {
+        while (table.firstChild) {
+            table.removeChild(table.firstChild);
+        }
+        tr = document.createElement("tr");
+        tr.innerHTML = "<th>Username</th><th>IP</th><th>Reset Reset Password</th><th>Delete Account</th>";
+        table.appendChild(tr);
+    }
+
+    setInterval(() => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/users", true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                let data = JSON.parse(xhr.responseText);
+                clearTR();
+                for (key in data) {
+                    tr = document.createElement("tr");
+                    tr.innerHTML = "<td>" + key + "</td><td>" + data[key]["ip"] + "</td><td><button onclick=\"resetPassword('" + key + "')\">Reset Password</button></td><td><button onclick=\"deleteAccount('" + key + "')\">Delete Account</button></td>";
+                    table.appendChild(tr);
+                }
+            }
+        }
+        xhr.send();
+    }, 2000);
+
+    const resetPassword = (username) => {
+        table.style.display = "none";
+        document.getElementById("resetPassword").style.display = "block";
+        document.getElementById("username").value = username;
+    }
+    const doResetPassword = () => {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+        if (username == "" || password == "") {
+            alert("Username or password is empty");
+            window.location.reload();
+        } else {
+            xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/resetPassword/" + username + "/" + password, true);
+            xhr.onreadystatechange = function() { 
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    alert("Successfully reset password");
+                    window.location.reload();
+                }
+            }
+            xhr.send();
+        }
+    }
+    const deleteAccount = (username) => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/deleteUser/" + username, true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                alert("Successfully deleted account");
+                window.location.reload();
+            }
+        }
+        xhr.send();
+    }
+    const createAccount = () => {
+        document.getElementById("createAccount").style.display = "block";
+        document.getElementById("createAccountAsk").style.display = "none";
+        table.style.display = "none";
+    }
+    const doCreateAccount = () => {
+        let username = document.getElementById("username2").value;
+        let password = document.getElementById("password2").value;
+        if (username == "" || password == "") {
+            alert("Username or password is empty");
+            window.location.reload();
+        } else {
+            xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/createUser/" + username + "/" + password, true);
+            xhr.onreadystatechange = function() { 
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    alert("Successfully created account");
+                    window.location.reload();
+                }
+            }
+            xhr.send();
+        }
+    }
+</script>
+</html>

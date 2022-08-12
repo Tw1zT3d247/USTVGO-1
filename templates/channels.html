@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channels</title>
+    <link rel="stylesheet" href="/static/css/channels.css">
+</head>
+<body>
+    <h1>Channels</h1>
+    <table id="table">
+        <tr>
+            <th>Name</th>
+            <th>ID</th>
+            <th>Location</th>
+            <th>VPN</th>
+            <th>Enabled</th>
+        </tr>
+        {% for channel in channels %}
+            <tr>
+                <td>{{ channels[channel]["name"] }}</td>
+                <td>{{ channels[channel]["id"] }}</td>
+                <td>/username/password/{{ channels[channel]["id"] }}.m3u8</td>
+                <td>{{ channels[channel]["vpn"] }}</td>
+                <td>
+                    <label class="switch">
+                        <input id="{{ channels[channel]['id'] }}" type="checkbox" onclick="handleCheckboxClick(`{{ channels[channel]['id'] }}`)" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button onclick="enableVPNChannels()">Enable VPN Channels</button>
+    <button onclick="disableVPNChannels()">Disable VPN Channels</button>
+</body>
+<script>
+    let table = document.getElementById("table");
+    setInterval(() => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/getDisabledChannels", true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                /// for loop through channels in table and if id is in response.split(\n) then disable checkbox
+                // response is plain text with newline separated ids
+                let channels = xhr.responseText.split("\n");
+                if (channels == undefined) { return; }
+                for (channel in channels) {
+                    try {
+                        id = channels[channel];
+                        console.log(`Disabled: ${id}`);
+                        let checkbox = document.getElementById(id);
+                        checkbox.checked = false;
+                    } catch (e) {
+                        console.log(`Channel ${id} is already disabled`);
+                    }
+                }
+            }
+        }
+        xhr.send();
+    }, 2000);
+    const handleCheckboxClick = (id) => {
+        // if checkbox is checked send request to  /api/disableIfEnabled/<channel> else send request to /api/enableIfDisabled/<channel>
+        let checkbox = document.getElementById(id);
+        if (checkbox.checked) {
+            xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/enableIfDisabled/" + id, true);
+            xhr.onreadystatechange = function() { 
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                }
+            }
+            xhr.send();
+        } else {
+            xhr = new XMLHttpRequest();
+            xhr.open("GET", "/api/disableIfEnabled/" + id, true);
+            xhr.onreadystatechange = function() { 
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                }
+            }
+            xhr.send();
+        }
+    }
+    const disableVPNChannels = () => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/disableVPNchannels", true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                let channels = xhr.responseText.split("\n");
+                if (channels == undefined) { return; }
+                for (channel in channels) {
+                    id = channels[channel];
+                    console.log(`Disabled: ${id}`);
+                    document.getElementById(id).checked = false;
+                }
+            }
+        }
+        xhr.send();
+    }
+    const enableVPNChannels = () => {
+        xhr = new XMLHttpRequest();
+        xhr.open("GET", "/api/enableVPNchannels", true);
+        xhr.onreadystatechange = function() { 
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                let channels = xhr.responseText.split("\n");
+                if (channels == undefined) { return; }
+                for (channel in channels) {
+                    id = channels[channel];
+                    console.log(`Enabled: ${id}`);
+                    document.getElementById(id).checked = true;
+                }
+            }
+        }
+        xhr.send();
+    }
+</script>
+</html>
