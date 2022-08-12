@@ -39,7 +39,7 @@ Script stores data in different directories based on os
 - Win$hit: ```%appdata%\ThePiratePlayer```
 ## License
 
-[MPL V2](https://www.mozilla.org/en-US/MPL/2.0/)
+[MIT](https://mit-license.org/)
 
 
 ## Legal
