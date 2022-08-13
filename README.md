@@ -35,8 +35,8 @@ http://ip:port/username/password/playlist.m3u
 
 ### Data
 Script stores data in different directories based on os
-- Linux: ```$home/.ThePiratePlayer```
-- Win$hit: ```%appdata%\ThePiratePlayer```
+- Linux: ```$home/.Parrot-USTVGO```
+- Win$hit: ```%appdata%\Parrot-USTVGO```
 ## License
 
 [MIT](https://mit-license.org/)
