@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, url_for, send_from_directory, redirect
+from flask import Flask, request, Response, url_for, send_from_directory
 from utils.sessions import createSession, verifySession, findAllExpired
 from utils.channels import getDisabledChannels
 from utils.users import login
@@ -45,7 +45,7 @@ def playlistm3u(username, password):
         vpn = True
         try: vpn = line[4]
         except: vpn = False
-        if vpn and not bool(getSetting("vpn")): continue
+        if vpn and getSetting("vpn").lower() != "true": continue
         url = url_for("play", username=username, password=password, channel=id, _external=True)
         if id in disabledChannels: continue
         m3u += f'#EXTINF:-1 tvg-id="{id}" tvg-logo="{logo}",{name}\n{url}\n'
