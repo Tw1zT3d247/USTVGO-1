@@ -38,6 +38,7 @@ def playlistm3u(username, password):
     m3u = "#EXTM3U\n"
     for line in channelInfo:
         if line == "": continue
+        line = line.replace("\n", "").replace("\r", "")
         line = line.split(" | ")
         name = line[0]
         id = line[1]
