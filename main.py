@@ -13,7 +13,7 @@ import re
 
 app = Flask(__name__)
 findAllExpired()
-proxy = "143.244.45.5:3128"
+proxy = ""
 protocol = "http"
 
 
