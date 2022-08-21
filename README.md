@@ -9,6 +9,7 @@ Install with git
 
 ```bash
   git clone https://github.com/ParrotDevelopers/USTVGO.git
+  cd USTVGO
   pip3 install -r requirements.txt
 ```
     
